@@ -1,0 +1,37 @@
+---
+title: "Capstone Project Proposals"
+author: "Qiaojuan Tu, Mark Kelly, Siting Lin "
+date: "9/8/2021"
+output: pdf_document
+---
+
+## Proposal I
+
+### 1.
+Research Question: How the COVID-19 stimulus checks affect the price of consumer goods (CPI)?
+
+### 2.
+The proposal is related to expertise in Economics, which is one of our members minor. 
+
+### 3.
+Our proposal in looking for how the stimulus checks impact the CPI is interesting to those who work in the field because we all observed prices of goods go up recently. People in the domain may be also curious about how much of the change in price is due to the issuance of stimulus checks during the pandemic. 
+
+### 4.
+The CPI data could be found on the FRED website in which FRED stands for Federal Reserve Economic Data. It is created and maintained by the Research Department of the Federal Reserve Bank of St. Louis, so it’s a credible and reliable resource for all economic related data. 
+
+
+
+## Proposal II
+### 1.
+Research Question:What percentage of the stimulus checks is contributing to the change of CPI/inflation?
+
+### 2.
+The proposal is related to expertise in Economics, which is one of our members minor.
+
+
+### 3.
+Our proposal is looking for how much of the stimulus checks goes to the change in price of goods. Since people may not spend all of the money they get, it will be interesting to see what proportion of the money contributes to the inflation and make a possible judgement on the stimulus checks’ impact.
+
+
+### 4.
+The inflation rate of the United States by month could be found on TradingEconomics website, which visualizes the inflation rate which is correlated with the economics of this country. 
