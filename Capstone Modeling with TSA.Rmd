@@ -1,0 +1,196 @@
+---
+title: "Capstone Modeling"
+author: "Qiaojuan Tu"
+date: "11/3/2021"
+output: pdf_document
+---
+
+
+```{r}
+#clean the environment 
+rm(list = ls())
+
+#Load packages 
+library(data.table)
+library(Metrics)
+library(readxl)
+library(ggplot2)
+```
+
+```{r}
+#Load Data 
+Stimulus_by_states <- read_excel("Checks_Amount.xlsx")
+CPI <- read_excel("CPIAUCSL.xlsx") #national CPI
+master <- merge(CPI, Stimulus_by_states)
+CPI_by_States <- read_excel("CPI_by_States.xlsx")
+```
+
+```{r}
+#manipulate the data 
+South <- subset(Stimulus_by_states, Region == "South")
+West  <- subset(Stimulus_by_states, Region == "West")
+Midwest <- subset(Stimulus_by_states, Region == "Midwest")
+Northeast <- subset(Stimulus_by_states, Region == "Northeast")
+
+South_CPI <- subset(CPI_by_States, Region == "South")
+West_CPI <- subset(CPI_by_States, Region == "West")
+Midwest_CPI <- subset(CPI_by_States, Region == "Midwest")
+Northeast_CPI <- subset(CPI_by_States, Region == "Northeast")
+
+#For South Region
+sum(South$Total_r1)/17
+sum(South$Total_r2)/17
+sum(South$Total_r3)/17
+
+South_CPI_R1 <- South_CPI[1:12,]
+South_CPI_R1$Stimulus <- sum(South$Total_r1)/17
+South_CPI_R2 <- South_CPI[13:14,]
+South_CPI_R2$Stimulus <- sum(South$Total_r2)/17
+South_CPI_R3 <- South_CPI[15:18,]
+South_CPI_R3$Stimulus <- sum(South$Total_r3)/17
+
+South_Final <- rbind(South_CPI_R1, South_CPI_R2, South_CPI_R3)
+
+#For West Region 
+sum(West$Total_r1)/13
+sum(West$Total_r2)/13
+sum(West$Total_r3)/13
+
+West_CPI_R1 <- West_CPI[1:12,]
+West_CPI_R1$Stimulus <- sum(West$Total_r1)/13
+West_CPI_R2 <- West_CPI[13:14,]
+West_CPI_R2$Stimulus <- sum(West$Total_r2)/13
+West_CPI_R3 <- West_CPI[15:18,]
+West_CPI_R3$Stimulus <- sum(West$Total_r3)/13
+
+West_Final <- rbind(West_CPI_R1, West_CPI_R2, West_CPI_R3)
+
+#For Midwest Region 
+sum(Midwest$Total_r1)/12
+sum(Midwest$Total_r2)/12
+sum(Midwest$Total_r3)/12
+
+Midwest_CPI_R1 <- Midwest_CPI[1:12,]
+Midwest_CPI_R1$Stimulus <- sum(Midwest$Total_r1)/12
+Midwest_CPI_R2 <- Midwest_CPI[13:14,]
+Midwest_CPI_R2$Stimulus <- sum(Midwest$Total_r2)/12
+Midwest_CPI_R3 <- Midwest_CPI[15:18,]
+Midwest_CPI_R3$Stimulus <- sum(Midwest$Total_r3)/12
+
+Midwest_Final <- rbind(Midwest_CPI_R1, Midwest_CPI_R2, Midwest_CPI_R3)
+
+#For  Northeast Region 
+sum(Northeast$Total_r1)/9
+sum(Northeast$Total_r2)/9
+sum(Northeast$Total_r3)/9
+
+Northeast_CPI_R1 <- Northeast_CPI[1:12,]
+Northeast_CPI_R1$Stimulus <- sum(Northeast$Total_r1)/9
+Northeast_CPI_R2 <- Northeast_CPI[13:14,]
+Northeast_CPI_R2$Stimulus <- sum(Northeast$Total_r2)/9
+Northeast_CPI_R3 <- Northeast_CPI[15:18,]
+Northeast_CPI_R3$Stimulus <- sum(Northeast$Total_r3)/9
+
+Northeast_Final <- rbind(Northeast_CPI_R1, Northeast_CPI_R2, Northeast_CPI_R3)
+
+
+#Put together 
+Master <- rbind(South_Final, West_Final, Midwest_Final, Northeast_Final)
+View(Master)
+```
+
+```{r}
+#create the linear model
+fit <- glm(CPI~Stimulus, data = Master, family = "gaussian")
+plot(fit)
+
+#create the logistic regression 
+fit2 <- glm(CPI~ Stimulus + Date, data = Master, family = "gaussian")
+plot(fit2)
+```
+
+
+```{r}
+require(TSA)
+require(forecast)
+require(astsa)
+## want to plot master
+plot(Master)
+
+## Looking at CPI as a response to Stimulus, we can see that there appears to be a trend also with the region of the 
+## states.  We can see if Region and Stimulus are predictors for the CPI
+
+fit3 <- glm(CPI~ Stimulus + Region, data = Master, family = "gaussian")
+plot(fit3)
+
+## plot the time series of our CPI
+plot.ts(Master$CPI, main="Time Series of CPI")
+
+## divide it up by region?
+par(mfrow=c(2,2))
+plot.ts(South_Final$CPI, main="Time Series of South Region CPI")
+plot.ts(West_Final$CPI, main="Time Series of West Region CPI")
+plot.ts(Midwest_Final$CPI, main="Time Series of Midwest Region CPI")
+plot.ts(Northeast_Final$CPI, main="Time Series of Northeast Region CPI")
+
+## take the difference of the different time series
+par(mfrow=c(2,2))
+plot.ts(diff(South_Final$CPI), main="Differenced Time Series of South Region CPI")
+plot.ts(diff(West_Final$CPI), main="Differenced Time Series of West Region CPI")
+plot.ts(diff(Midwest_Final$CPI), main="Differenced Time Series of Midwest Region CPI")
+plot.ts(diff(Northeast_Final$CPI), main="Differenced Time Series of Northeast Region CPI")
+
+## take the difference of the difference of the different time series
+## this is only here so we can see the above plots ok
+par(mfrow=c(2,2))
+plot.ts(diff(diff(South_Final$CPI)), main="Differenced Time Series of South Region CPI")
+plot.ts(diff(diff(West_Final$CPI)), main="Differenced Time Series of West Region CPI")
+plot.ts(diff(diff(Midwest_Final$CPI)), main="Differenced Time Series of Midwest Region CPI")
+plot.ts(diff(diff(Northeast_Final$CPI)), main="Differenced Time Series of Northeast Region CPI")
+
+## acf of the time series
+par(mfrow=c(2,2))
+acf2(South_Final$CPI)
+acf2(West_Final$CPI)
+acf2(Midwest_Final$CPI)
+acf2(Northeast_Final$CPI)
+
+## acf of the differenced time series
+par(mfrow=c(2,2))
+acf2(diff(South_Final$CPI))
+acf2(diff(West_Final$CPI))
+acf2(diff(Midwest_Final$CPI))
+acf2(diff(Northeast_Final$CPI))
+```
+
+
+```{r}
+require(TSA)
+require(astsa)
+require(forecast)
+## read in the data
+x=ts(Master$Stimulus)
+y=ts(Master$CPI)
+
+## plot our data
+plot.ts(x)
+plot.ts(y)
+plot.ts(x, y, xy.lines=F, xy.labels=F)
+
+## create our simple linear regression model
+regmodel=lm(y~x)
+summary(regmodel)
+
+
+## predictors: Stimulus+Region
+## response: CPI
+regmodel2=lm(y~x+Master$Region, data=Master)
+summary(regmodel2)
+
+## look at the residuals
+par(mfrow=c(2,2))
+plot(regmodel2,which=1:4)
+acf2(residuals(regmodel2))
+```
+
+
